@@ -11,8 +11,8 @@
 //!   re-armed (deleted and re-added with a fresh allowance) at every `bell`.
 //! * Soft cap (policy): `pay` records spend per day and panics with
 //!   `SPENDCAP_DENIED` if the payment would exceed the seat's daily cap or
-//!   the max price per request. Only `pay` moves value, and only to the
-//!   configured inference provider.
+//!   the max price per request. Agent payments go only to the configured
+//!   inference provider; the owner can also withdraw idle funds.
 //!
 //! A day ends at the `bell`: the owner (seat holder / quotum operator) may ring
 //! it at any time; anyone may ring it once `day_length_sec` has elapsed. The
@@ -156,6 +156,10 @@ impl SpendCap {
             env::predecessor_account_id() == env::current_account_id(),
             "pay must be signed by a key of this wallet"
         );
+        // Key actions are asynchronous. Reject stale receipts even before
+        // DeleteKey executes, or if a key-management promise fails.
+        require!(self.agent_key_active, "agent key revoked");
+        require!(env::signer_account_pk() == self.agent_key, "pay must use the current agent key");
         if request_id.is_empty() || request_id.len() > MAX_REQUEST_ID_LEN {
             deny("request_id must be 1..=64 bytes");
         }
@@ -172,7 +176,8 @@ impl SpendCap {
                 request_id
             ));
         }
-        let new_spent = self.spent_today.saturating_add(amount);
+        let new_spent = self.spent_today.checked_add(amount)
+            .unwrap_or_else(|| deny("spend overflow"));
         if new_spent > self.daily_cap {
             deny(&format!(
                 "over daily cap: spent {} + {} > cap {} (day {}, request {})",
@@ -194,8 +199,8 @@ impl SpendCap {
         emit(
             "paid",
             format!(
-                "{{\"request_id\":\"{}\",\"amount\":\"{}\",\"provider_id\":\"{}\",\"day\":{},\"spent_today\":\"{}\",\"daily_cap\":\"{}\",\"requests_today\":{}}}",
-                request_id,
+                "{{\"request_id\":{},\"amount\":\"{}\",\"provider_id\":\"{}\",\"day\":{},\"spent_today\":\"{}\",\"daily_cap\":\"{}\",\"requests_today\":{}}}",
+                near_sdk::serde_json::to_string(&request_id).unwrap(),
                 amount.as_yoctonear(),
                 self.provider_id,
                 self.day,
@@ -248,6 +253,14 @@ impl SpendCap {
             ),
         );
         self.history.insert(self.day, rec);
+        // LookupMap writes are deferred. Flush before measuring the new
+        // storage stake; a failed check rolls the receipt back on-chain.
+        self.history.flush();
+        let storage = env::storage_byte_cost().saturating_mul(env::storage_usage() as u128);
+        require!(
+            env::account_balance() >= storage.saturating_add(RESERVE),
+            "bell would leave less than storage + reserve"
+        );
         self.day += 1;
         self.day_started_ns = now;
         self.spent_today = NearToken::from_yoctonear(0);
@@ -382,7 +395,8 @@ impl SpendCap {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use near_sdk::test_utils::VMContextBuilder;
+    use near_sdk::mock::MockAction;
+    use near_sdk::test_utils::{get_created_receipts, get_logs, VMContextBuilder};
     use near_sdk::testing_env;
 
     fn wallet() -> AccountId {
@@ -402,6 +416,8 @@ mod tests {
     fn ctx(pred: AccountId, ts: u64) {
         let mut b = VMContextBuilder::new();
         b.current_account_id(wallet())
+            .signer_account_id(pred.clone())
+            .signer_account_pk(key())
             .predecessor_account_id(pred)
             .block_timestamp(ts)
             .account_balance(NearToken::from_near(5));
@@ -500,5 +516,197 @@ mod tests {
         let mut c = setup();
         ctx(wallet(), 2_000);
         c.set_policy(Some(U128(1_000 * MILLI)), None, None);
+    }
+
+    fn assert_pay_denied(c: &mut SpendCap, request_id: &str, amount: u128) {
+        let before = (c.spent_today, c.requests_today, c.total_paid);
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            c.pay(request_id.into(), U128(amount)).detach();
+        }));
+        assert!(result.is_err(), "payment must be denied");
+        assert_eq!((c.spent_today, c.requests_today, c.total_paid), before);
+        assert!(get_created_receipts().is_empty(), "denial must not schedule actions");
+    }
+
+    #[test]
+    fn revoked_agent_cannot_pay_while_delete_key_is_pending() {
+        let mut c = setup();
+        ctx(owner(), 2_000);
+        c.revoke_agent().detach();
+        // Model a previously admitted pay receipt executing before DeleteKey.
+        ctx(wallet(), 3_000);
+        assert_pay_denied(&mut c, "queued-before-revoke", MILLI);
+    }
+
+    #[test]
+    fn replaced_agent_cannot_pay_with_a_previously_admitted_receipt() {
+        let mut c = setup();
+        let replacement: PublicKey = vec![0u8; 33].try_into().unwrap();
+        ctx(owner(), 2_000);
+        c.set_agent_key(replacement.clone()).detach();
+        ctx(wallet(), 3_000); // still signed by the old key
+        assert_pay_denied(&mut c, "queued-before-rotation", MILLI);
+
+        let mut b = VMContextBuilder::new();
+        b.current_account_id(wallet())
+            .predecessor_account_id(wallet())
+            .signer_account_id(wallet())
+            .signer_account_pk(replacement)
+            .block_timestamp(4_000)
+            .account_balance(NearToken::from_near(5));
+        testing_env!(b.build());
+        c.pay("new-key".into(), U128(MILLI)).detach();
+        assert_eq!(c.spent_today.as_yoctonear(), MILLI);
+    }
+
+    #[test]
+    fn spend_addition_cannot_saturate_past_u128_cap() {
+        let mut c = setup();
+        // Exercise the accepted U128 policy domain, without pretending this
+        // accumulated spend is reachable with the demo's funding and lifetime.
+        c.daily_cap = NearToken::from_yoctonear(u128::MAX);
+        c.spent_today = NearToken::from_yoctonear(u128::MAX - 1);
+        ctx(wallet(), 2_000);
+        assert_pay_denied(&mut c, "overflow", 2);
+    }
+
+    #[test]
+    #[should_panic(expected = "bell would leave less than storage + reserve")]
+    fn public_bell_cannot_stake_the_wallet_reserve() {
+        let mut c = setup();
+        let usage = 1_000;
+        let mut b = VMContextBuilder::new();
+        b.current_account_id(wallet())
+            .predecessor_account_id("stranger.testnet".parse().unwrap())
+            .block_timestamp(1_000 + 86_400 * 1_000_000_000)
+            .storage_usage(usage)
+            .account_balance(env::storage_byte_cost().saturating_mul(usage as u128).saturating_add(RESERVE));
+        testing_env!(b.build());
+        c.bell();
+    }
+
+    #[test]
+    fn paid_event_escapes_untrusted_request_id() {
+        let mut c = setup();
+        ctx(wallet(), 2_000);
+        let request_id = "quote\"\\\n\t\u{0}";
+        c.pay(request_id.into(), U128(MILLI)).detach();
+        let logs = get_logs();
+        let event: near_sdk::serde_json::Value = near_sdk::serde_json::from_str(
+            logs.last().unwrap().strip_prefix("EVENT_JSON:").unwrap(),
+        ).expect("accepted request IDs must produce valid event JSON");
+        assert_eq!(event["data"][0]["request_id"], request_id);
+        assert_eq!(event["data"][0]["amount"], MILLI.to_string());
+    }
+
+    #[test]
+    fn duplicate_request_ids_still_consume_the_cap_and_pay_only_provider() {
+        let mut c = setup();
+        for i in 0..5 {
+            ctx(wallet(), 2_000 + i);
+            c.pay("same-id".into(), U128(10 * MILLI)).detach();
+            let receipts = get_created_receipts();
+            assert_eq!(receipts.len(), 1);
+            assert_eq!(receipts[0].receiver_id, provider());
+            assert!(matches!(receipts[0].actions.as_slice(),
+                [MockAction::Transfer { deposit, .. }] if deposit.as_yoctonear() == 10 * MILLI));
+        }
+        ctx(wallet(), 3_000);
+        assert_pay_denied(&mut c, "same-id", 1);
+    }
+
+    #[test]
+    fn elapsed_time_alone_does_not_reset_spend() {
+        let mut c = setup();
+        for _ in 0..5 {
+            c.pay("full".into(), U128(10 * MILLI)).detach();
+        }
+        ctx(wallet(), u64::MAX);
+        assert_pay_denied(&mut c, "after-many-days", 1);
+        assert_eq!(c.day, 0);
+    }
+
+    #[test]
+    fn bell_boundary_is_exact_and_cannot_be_repeated_or_backdated() {
+        let mut c = setup();
+        let deadline = 1_000 + 86_400 * 1_000_000_000;
+        for ts in [999, deadline - 1] {
+            ctx("stranger.testnet".parse().unwrap(), ts);
+            let r = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| c.bell()));
+            assert!(r.is_err());
+            assert_eq!(c.day, 0);
+        }
+        ctx("stranger.testnet".parse().unwrap(), deadline);
+        c.bell();
+        for ts in [deadline, deadline - 1] {
+            ctx("stranger.testnet".parse().unwrap(), ts);
+            let r = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| c.bell()));
+            assert!(r.is_err());
+            assert_eq!(c.day, 1);
+        }
+    }
+
+    #[test]
+    fn public_bell_after_revoke_schedules_no_key_actions() {
+        let mut c = setup();
+        ctx(owner(), 2_000);
+        c.revoke_agent().detach();
+        ctx("stranger.testnet".parse().unwrap(), 1_000 + 86_400 * 1_000_000_000);
+        c.bell();
+        assert!(!c.agent_key_active);
+        assert!(get_created_receipts().is_empty());
+    }
+
+    #[test]
+    fn stranger_provider_and_wallet_cannot_manage_policy_keys_or_withdraw() {
+        let mut c = setup();
+        for caller in ["stranger.testnet".parse().unwrap(), provider(), wallet()] {
+            for method in 0..4 {
+                ctx(caller.clone(), 2_000);
+                let r = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                    match method {
+                        0 => c.set_policy(Some(U128(100 * MILLI)), None, None),
+                        1 => c.revoke_agent().detach(),
+                        2 => c.set_agent_key(key()).detach(),
+                        _ => c.withdraw(U128(MILLI)).detach(),
+                    }
+                }));
+                assert!(r.is_err());
+                assert!(get_created_receipts().is_empty());
+                assert!(c.agent_key_active);
+                assert_eq!(c.daily_cap.as_yoctonear(), 50 * MILLI);
+            }
+        }
+    }
+
+    #[test]
+    fn provider_cannot_call_pay_or_reinitialize_wallet() {
+        let mut c = setup();
+        ctx(provider(), 2_000);
+        assert_pay_denied(&mut c, "provider", MILLI);
+        let r = std::panic::catch_unwind(|| {
+            SpendCap::new(owner(), provider(), key(), U128(MILLI), U128(MILLI), U128(MILLI), 1)
+        });
+        assert!(r.is_err());
+        assert!(get_created_receipts().is_empty());
+    }
+
+    #[test]
+    fn failed_transfer_result_does_not_restore_spending_capacity() {
+        let mut c = setup();
+        for _ in 0..5 {
+            c.pay("attempt".into(), U128(10 * MILLI)).detach();
+        }
+        ctx(wallet(), 2_000);
+        let mut b = VMContextBuilder::new();
+        b.current_account_id(wallet())
+            .predecessor_account_id(wallet())
+            .signer_account_id(wallet())
+            .signer_account_pk(key())
+            .account_balance(NearToken::from_near(5));
+        testing_env!(b.build(), near_sdk::test_vm_config(), near_sdk::RuntimeFeesConfig::test(),
+            std::collections::HashMap::new(), vec![near_sdk::PromiseResult::Failed]);
+        assert_pay_denied(&mut c, "retry-after-refund", MILLI);
+        assert_eq!(c.total_paid.as_yoctonear(), 50 * MILLI);
     }
 }

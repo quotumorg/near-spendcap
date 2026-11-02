@@ -41,6 +41,15 @@ The verifier uses Python stdlib and archival testnet RPC. To check a saved run's
 
 ## latest testnet evidence
 
+contract changed after the 2026-11-02 testnet run; rerun ./reproduce.sh for fresh hashes
+
+Changes after that run:
+
+- `pay` rejects revoked keys and receipts signed by a replaced agent key.
+- Spend addition rejects overflow instead of saturating at the cap.
+- The bell checks storage plus reserve after writing its day record.
+- Paid events JSON-escape the request ID.
+
 Recorded on 2026-11-02, `run-2026-11-02T02-06-16-847Z`. The supplied verification record reports 28 passed and 0 failed, including comparison to that run's local Wasm. This preparation did not repeat network verification. Explorer links could not be checked offline; earlier reports describe an indexer delay.
 
 Wallet: [agent.qsc-mvymazzqe8df.testnet](https://testnet.nearblocks.io/address/agent.qsc-mvymazzqe8df.testnet). Recorded Wasm SHA-256: `39db08b11276e2e858c99d31bda972ce859b2be8a6ea91d5b8b738a9dba07648` (176127 bytes).
@@ -73,6 +82,10 @@ Full records: [latest run](runs/run-2026-11-02T02-06-16-847Z.md), [latest JSON](
 
 - The allowance bounds fees and transaction count, not value; value is bounded by the contract. Recommended: the owner funds the wallet with about one day's cap at a time, so the worst case for a contract bug is one day of budget.
 - The soft cap is whatever the owner sets. quotum's holder vote is not on NEAR yet: `set_policy` is owner-only, and the owner can also ring the bell early.
+- Days end at the bell, not in a rolling 24-hour window. Time alone does not reset spend. A payment just before the bell and another just after it count toward different days.
+- Spend is charged when a transfer is scheduled. Failed transfers do not restore the cap. `spent_today` and `total_paid` count scheduled amounts, not confirmed provider receipts.
+- Each bell adds a permanent day record. The owner must fund its storage stake above the 0.05 NEAR reserve. A bell without that funding fails.
+- Revocation and key replacement block later-executing payments. Transfers already scheduled by successful calls cannot be recalled. Key updates are asynchronous; `agent_key_active` records contract authorization, not confirmed access-key existence.
 - Part of the allowance is unusable headroom.
 - The endpoint is a local mock; payments are in testnet NEAR, not a stablecoin.
 - Once locked, the contract cannot be upgraded. That is by design for the demo; production needs an upgrade path such as a timelocked owner.
@@ -84,7 +97,7 @@ The mock's replay guard is in memory and resets on restart. It trusts one RPC, d
 
 quotum existed before this hackathon. The existing service enforced inference caps off-chain; this repository contains the NEAR integration built for the 2026-11-01 to 2026-11-14 window:
 
-- Rust policy wallet using near-sdk 5.30.0: daily ledger, cap, max price, fixed provider, bell, kill switch, and 9 unit tests.
+- Rust policy wallet using near-sdk 5.30.0: daily ledger, cap, max price, fixed provider, bell, kill switch, and 21 unit tests.
 - An agent function-call key scoped to `pay` on its own wallet, with an allowance re-armed by the bell.
 - A local inference mock that checks final NEAR payments and rejects payment-hash reuse during its process lifetime.
 - Reproduction script, agent probes, two recorded testnet runs, and independent Python verifier.
