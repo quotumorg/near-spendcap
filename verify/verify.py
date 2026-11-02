@@ -10,7 +10,7 @@ usage: python3 -I verify/verify.py runs/<run-id>.json [path/to/local.wasm]
 """
 import base64, hashlib, json, os, sys, urllib.request
 
-RPC = getattr(os, "environ").get("VERIFY_RPC", "https://archival-rpc.testnet.fastnear.com")
+RPC = os.environ.get("VERIFY_RPC", "https://archival-rpc.testnet.fastnear.com")
 YOCTO = 10**24
 ok_count = fail_count = 0
 

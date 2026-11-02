@@ -4,8 +4,8 @@ import os from "node:os";
 import path from "node:path";
 
 export const NETWORK = "testnet"; // hard-coded on purpose: this demo never touches mainnet
-export const RPC_URL = process["env"].NEAR_RPC_URL || "https://test.rpc.fastnear.com"; // rpc.testnet.near.org now answers -429 "deprecated"
-export const FAUCET_URL = process["env"].NEAR_FAUCET_URL || "https://helper.testnet.near.org/account";
+export const RPC_URL = process.env.NEAR_RPC_URL || "https://test.rpc.fastnear.com"; // rpc.testnet.near.org now answers -429 "deprecated"
+export const FAUCET_URL = process.env.NEAR_FAUCET_URL || "https://helper.testnet.near.org/account";
 export const EXPLORER = "https://testnet.nearblocks.io";
 
 if (/mainnet/i.test(RPC_URL)) throw new Error(`refusing mainnet RPC ${RPC_URL}`);
@@ -19,7 +19,7 @@ export async function assertTestnet() {
 
 // Throwaway testnet keys live here, never inside the repo.
 export const CREDS_DIR =
-  process["env"].SPENDCAP_CREDS_DIR || path.join(os.homedir(), ".near-credentials-quotum-spendcap", NETWORK);
+  process.env.SPENDCAP_CREDS_DIR || path.join(os.homedir(), ".near-credentials-quotum-spendcap", NETWORK);
 
 export const txLink = (h) => `${EXPLORER}/txns/${h}`;
 export const accLink = (a) => `${EXPLORER}/address/${a}`;

@@ -13,7 +13,7 @@ target/
 *.deploy.json
 *.provider.json
 *.stranger.json
-[.]env
-[.]env.*
+.env
+.env.*
 __pycache__/
 *.pyc

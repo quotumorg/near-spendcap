@@ -20,7 +20,7 @@ import { Agent } from "./agent.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..");
-const env = process["env"];
+const env = process.env;
 const CFG = {
   wasm: env.WASM || path.join(ROOT, "contract/target/near/quotum_spendcap.wasm"),
   price: near(env.PRICE_NEAR || "0.01"),
