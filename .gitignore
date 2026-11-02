@@ -1,0 +1,19 @@
+# build output and deps never go in the repo
+node_modules/
+contract/target/
+target/
+*.wasm
+# credentials / keys must never be committed (stored outside the repository)
+.near-credentials/
+.near-credentials*/
+*.key
+*-key.json
+*.owner.json
+*.agent.json
+*.deploy.json
+*.provider.json
+*.stranger.json
+[.]env
+[.]env.*
+__pycache__/
+*.pyc

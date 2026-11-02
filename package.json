@@ -1,0 +1,13 @@
+{
+  "name": "quotum-near-spendcap",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "quotum spend caps enforced on NEAR testnet: FC-key allowance (hard cap) + wallet contract policy (soft cap)",
+  "scripts": {
+    "reproduce": "node agent/reproduce.mjs"
+  },
+  "dependencies": {
+    "near-api-js": "7.4.0"
+  }
+}
