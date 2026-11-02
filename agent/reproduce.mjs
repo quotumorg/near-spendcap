@@ -7,6 +7,7 @@
 // 10 owner rings the bell -> next day: caps reset, agent pays again   11 write runs/<id>.json + .md
 // Env: WASM, PRICE_NEAR, DAILY_CAP_NEAR, ALLOWANCE_NEAR, PAY_GAS_TGAS, WALLET_FUND_NEAR, LOCK_WALLET, STORM_MAX
 import fs from "node:fs";
+import assert from "node:assert/strict";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
@@ -60,6 +61,7 @@ async function faucetAccount() {
   for (let a = 0; a < 4; a++) {
     const r = await fetch(FAUCET_URL, {
       method: "POST",
+      signal: AbortSignal.timeout(30_000),
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ newAccountId: id, newAccountPublicKey: kp.getPublicKey().toString() }),
     });
@@ -83,6 +85,7 @@ async function waitAccount(id) {
 }
 
 async function main() {
+  if (env.WASM !== undefined && !fs.existsSync(CFG.wasm)) throw new Error("explicit WASM path does not exist");
   if (!fs.existsSync(CFG.wasm)) {
     const alt = path.join(ROOT, "contract/target/wasm32-unknown-unknown/release/quotum_spendcap.wasm");
     if (fs.existsSync(alt)) CFG.wasm = alt;
@@ -124,10 +127,13 @@ async function main() {
   saveCreds(walletId, agentKp, "agent");
   const w = await send(ownerAcc, walletId, [actions.createAccount(), actions.transfer(CFG.walletFund), actions.addFullAccessKey(deployKp.getPublicKey())], `create wallet ${walletId}`);
   step("wallet_created", { account: walletId, ...w });
+  if (!w.ok) throw new Error("wallet creation failed");
   const p = await send(ownerAcc, providerId, [actions.createAccount(), actions.transfer(CFG.providerFund), actions.addFullAccessKey(providerKp.getPublicKey())], `create provider ${providerId}`);
   step("provider_created", { account: providerId, ...p });
+  if (!p.ok) throw new Error("provider creation failed");
   const sc = await send(ownerAcc, strangerId, [actions.createAccount(), actions.transfer(CFG.providerFund), actions.addFullAccessKey(strangerKp.getPublicKey())], `create stranger ${strangerId}`);
   step("stranger_created", { account: strangerId, ...sc });
+  if (!sc.ok) throw new Error("stranger creation failed");
 
   // 3. deploy + init on the wallet itself (init adds the agent's FC key with the allowance)
   const walletDeployAcc = new Account(walletId, provider, deployKp.toString());
@@ -148,6 +154,7 @@ async function main() {
   if (CFG.lock) {
     const l = await send(walletDeployAcc, walletId, [actions.deleteKey(deployKp.getPublicKey())], "lock wallet (delete its full-access key)");
     step("lock_wallet", l);
+    if (!l.ok) throw new Error("wallet lock failed");
   }
   await sleep(1500);
   const keys = await viewKeys(walletId);
@@ -193,6 +200,7 @@ async function main() {
     const stBefore = await viewCall(walletId, "get_status");
     const bell = await send(ownerAcc, walletId, [actions.functionCall("bell", {}, 50n * TGAS, 0n)], "owner rings bell");
     step("owner_bell", { status_before: stBefore, ...bell });
+    if (!bell.ok) throw new Error("owner bell failed");
     await sleep(1500);
     const st1 = await viewCall(walletId, "get_status");
     const k1 = await viewAccessKey(walletId, agentKp.getPublicKey().toString());
@@ -213,6 +221,33 @@ async function main() {
     endpoint_stats: ep.stats,
     final_status: stEnd,
   };
+  // A successful exit certifies the documented scenario, including with overrides.
+  const recorded = (name) => run.steps.find((s) => s.name === name);
+  const day0 = recorded("day0_loop").requests;
+  const paid = (r) => r.pay?.kind === "ok" && r.served?.status === 200;
+  assert.equal(recorded("lock_wallet")?.ok, true, "wallet must be locked");
+  assert.equal(keys.length, 1, "locked wallet must have only the agent key");
+  assert.equal(keys[0].public_key, agentKp.getPublicKey().toString());
+  assert.notEqual(keys[0].access_key.permission, "FullAccess");
+  assert.equal(day0.length, 6, "day 0 must stop at the sixth request");
+  assert.ok(day0.slice(0, 5).every(paid), "five day-0 payments must be served");
+  assert.equal(day0[5].pay?.kind, "denied", "sixth payment must be denied on-chain");
+  assert.match(day0[5].pay.reason, /over daily cap/i, "denial must be the soft cap");
+  const probes = recorded("forbidden_probes").results;
+  assert.equal(probes.length, 4, "all forbidden probes must run");
+  assert.ok(probes.every((r) => r.kind === "rejected" && !r.hash), "all forbidden probes must be refused before inclusion");
+  const stranger = recorded("stranger_bell_early");
+  assert.equal(stranger.ok, false, "stranger must not ring early");
+  assert.match(stranger.reason, /owner|early|day.*end/i, "stranger must be denied by bell authorization");
+  const refusals = [...recorded("retry_storm").attempts, recorded("request_after_hardcap").pay];
+  assert.ok(refusals.some((r) => r?.kind === "rejected" && !r.hash && /NotEnoughAllowance|Not enough allowance/i.test(r.reason)), "protocol allowance refusal required");
+  assert.equal(recorded("owner_bell").ok, true, "owner bell must succeed");
+  assert.equal(String(recorded("status_day1_start").status.day), "1", "bell must advance to day 1");
+  const day1 = recorded("day1_loop").requests;
+  assert.equal(day1.length, 1);
+  assert.ok(paid(day1[0]), "day-1 payment must be served");
+  assert.equal(ep.stats.served, 6, "endpoint must serve six requests");
+  assert.equal(provBal1 - provBal0, 6n * CFG.price, "provider must receive six payments");
   run.finished = nowIso();
   const outDir = path.join(ROOT, "runs");
   fs.mkdirSync(outDir, { recursive: true });

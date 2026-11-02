@@ -45,6 +45,7 @@ export async function rpc(method, params, { retries = 4 } = {}) {
     try {
       const r = await fetch(RPC_URL, {
         method: "POST",
+        signal: AbortSignal.timeout(30_000),
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ jsonrpc: "2.0", id: ++rpcId, method, params }),
       });

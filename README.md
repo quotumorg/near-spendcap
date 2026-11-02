@@ -9,7 +9,7 @@ A NEAR function-call key allowance bounds an agent's fees and transaction count,
 | hard | NEAR function-call key: receiver = wallet, method = `pay`, allowance = 0.008 NEAR | fees and transaction count, including transactions in flight; not payment value | `bell()` deletes and re-adds the key |
 | soft | wallet contract: daily cap = 0.05 NEAR, max price = 0.01 NEAR | payment value to the configured provider | `bell()` records spent and unspent, then starts the next day |
 
-These are the demo defaults. The locked wallet has no full-access key. The owner can set policy, revoke or restore the agent, withdraw, and ring the bell early; anyone can ring after 24 hours. The agent can only call `pay`. The allowance is a lifetime counter until the bell re-arms it. The NEAR demo records unspent budget; it does not execute quotum's buyback or burn.
+These are the demo defaults. The locked wallet has no full-access key. The owner can set policy, revoke or restore the agent, withdraw, and ring the bell early; any account other than the wallet itself can ring after 24 hours. The agent can only call `pay`. The allowance is a lifetime counter until the bell re-arms it. The NEAR demo records unspent budget; it does not execute quotum's buyback or burn.
 
 ## quickstart
 
@@ -19,9 +19,9 @@ Requires Rust 1.95 or newer, Node 22 or newer with npm, Python 3, and network ac
 ./reproduce.sh
 ```
 
-This builds and tests the contract, installs locked JavaScript dependencies, creates faucet accounts, deploys and locks a testnet wallet, and runs the scenario. Five payments succeed, the sixth exceeds the soft cap, forbidden actions are refused, retries reach the allowance limit, and a bell enables the next day's payment. Each run writes a JSON record and a Markdown transaction table under `runs/`.
+This builds and tests the contract, installs locked JavaScript dependencies, creates faucet accounts, deploys and locks a testnet wallet, and runs the scenario. Five payments succeed, the sixth exceeds the soft cap, forbidden actions are refused, retries reach the allowance limit, and a bell enables the next day's payment. A completed run writes a JSON record and a Markdown transaction table under `runs/`; caught failures write a failed JSON record.
 
-By default, throwaway credentials are stored outside the repository in a hidden testnet credentials directory under the home directory. If you set `SPENDCAP_CREDS_DIR`, choose a directory outside the repository. `NEAR_RPC_URL` overrides the testnet RPC; the script checks `chain_id` before signing. Demo settings: `PRICE_NEAR`, `DAILY_CAP_NEAR`, `ALLOWANCE_NEAR`, `PAY_GAS_TGAS`, and `DAY_LENGTH_SEC`.
+By default, throwaway credentials are stored outside the repository in a hidden testnet credentials directory under the home directory. If you set `SPENDCAP_CREDS_DIR`, choose a directory outside the repository; `reproduce.sh` rejects paths inside it, including symlink targets. `NEAR_RPC_URL` overrides the testnet RPC; the script checks `chain_id` before signing. Demo settings: `PRICE_NEAR`, `DAILY_CAP_NEAR`, `ALLOWANCE_NEAR`, `PAY_GAS_TGAS`, and `DAY_LENGTH_SEC`.
 
 ## verify
 

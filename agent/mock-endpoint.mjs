@@ -68,6 +68,7 @@ export function startMockEndpoint({ port = 0, providerId, priceYocto, allowedWal
       stats.rejected++;
       return send(409, { error: "payment tx already used" });
     }
+    used.add(txHash); // Reserve before verification yields to another redemption.
     let why;
     try {
       why = await verify(txHash, wallet, requestId);
@@ -75,11 +76,11 @@ export function startMockEndpoint({ port = 0, providerId, priceYocto, allowedWal
       why = `verify error: ${e.message.slice(0, 200)}`;
     }
     if (why) {
+      used.delete(txHash);
       stats.rejected++;
       log(`[endpoint] reject ${requestId}: ${why}`);
       return send(402, { error: why });
     }
-    used.add(txHash);
     stats.served++;
     const prompt = String(j.prompt || "");
     return send(200, {

@@ -6,12 +6,35 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+for tool in rustup rustc cargo node npm python3; do
+  if ! command -v "$tool" >/dev/null 2>&1; then
+    echo "Missing prerequisite: $tool. Install Rust through rustup, Node 22+ with npm, and Python 3 before running reproduce.sh." >&2
+    exit 1
+  fi
+done
+
+# Resolve symlinks and nonexistent path tails without GNU-specific shell utilities.
+python3 - "$PWD" "${SPENDCAP_CREDS_DIR:-}" <<'PYTHON'
+import os
+import sys
+repo = os.path.realpath(sys.argv[1])
+if sys.argv[2]:
+    creds = os.path.realpath(sys.argv[2])
+    if os.path.commonpath([repo, creds]) == repo:
+        sys.exit("SPENDCAP_CREDS_DIR must be outside the repository (including symlink targets).")
+PYTHON
+
+if [ "${WASM+x}" = x ] && [ ! -f "$WASM" ]; then
+  echo "Explicit WASM path does not exist or is not a file: $WASM" >&2
+  exit 1
+fi
+
 echo "== toolchain"
 rustc --version
 cargo --version
 node --version
 npm --version
-rustup target list --installed | grep -q wasm32-unknown-unknown || rustup target add wasm32-unknown-unknown
+rustup target list --installed | grep -x wasm32-unknown-unknown >/dev/null || rustup target add wasm32-unknown-unknown
 
 echo "== build contract"
 if cargo near --version >/dev/null 2>&1; then

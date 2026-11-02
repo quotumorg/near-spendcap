@@ -42,6 +42,7 @@ export class Agent {
     }
     const r = await fetch(`${this.endpointUrl}/v1/infer`, {
       method: "POST",
+      signal: AbortSignal.timeout(30_000),
       headers,
       body: JSON.stringify({ request_id: requestId, prompt }),
     });
