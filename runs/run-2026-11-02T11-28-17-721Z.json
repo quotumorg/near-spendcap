@@ -1,0 +1,736 @@
+{
+ "id": "run-2026-11-02T11-28-17-721Z",
+ "network": "testnet",
+ "rpc": "https://test.rpc.fastnear.com",
+ "started": "2026-11-02T11:28:17.721Z",
+ "steps": [
+  {
+   "name": "owner_created",
+   "at": "2026-11-02T11:28:23.296Z",
+   "account": "qsc-mvz6dr8l7057.testnet",
+   "link": "https://testnet.nearblocks.io/address/qsc-mvz6dr8l7057.testnet",
+   "faucet": {
+    "url": "https://helper.testnet.near.org/account",
+    "status": 200,
+    "hash": "5Wr8vCdrCLrLhxTdvMfnZhafLxthZNGjfdSty8xfRyuq"
+   },
+   "hash": "5Wr8vCdrCLrLhxTdvMfnZhafLxthZNGjfdSty8xfRyuq"
+  },
+  {
+   "name": "wallet_created",
+   "at": "2026-11-02T11:28:27.780Z",
+   "account": "agent.qsc-mvz6dr8l7057.testnet",
+   "label": "create wallet agent.qsc-mvz6dr8l7057.testnet",
+   "hash": "BnnZ2r9unMCVLwH85dCakTcXbfnPmtqxfyy9PZkwGS6v",
+   "link": "https://testnet.nearblocks.io/txns/BnnZ2r9unMCVLwH85dCakTcXbfnPmtqxfyy9PZkwGS6v",
+   "ok": true,
+   "reason": null,
+   "events": []
+  },
+  {
+   "name": "provider_created",
+   "at": "2026-11-02T11:28:31.962Z",
+   "account": "infer.qsc-mvz6dr8l7057.testnet",
+   "label": "create provider infer.qsc-mvz6dr8l7057.testnet",
+   "hash": "FHsbNKpVPZTTwFafm18ftB3AUiTeMa8x9smXH4qzfs7N",
+   "link": "https://testnet.nearblocks.io/txns/FHsbNKpVPZTTwFafm18ftB3AUiTeMa8x9smXH4qzfs7N",
+   "ok": true,
+   "reason": null,
+   "events": []
+  },
+  {
+   "name": "stranger_created",
+   "at": "2026-11-02T11:28:36.156Z",
+   "account": "stranger.qsc-mvz6dr8l7057.testnet",
+   "label": "create stranger stranger.qsc-mvz6dr8l7057.testnet",
+   "hash": "hqWojSVLC7iki6e2tK1D1mbK5PHzTMnm5eYs1BFEvLf",
+   "link": "https://testnet.nearblocks.io/txns/hqWojSVLC7iki6e2tK1D1mbK5PHzTMnm5eYs1BFEvLf",
+   "ok": true,
+   "reason": null,
+   "events": []
+  },
+  {
+   "name": "deploy_init",
+   "at": "2026-11-02T11:28:40.934Z",
+   "initArgs": {
+    "owner_id": "qsc-mvz6dr8l7057.testnet",
+    "provider_id": "infer.qsc-mvz6dr8l7057.testnet",
+    "agent_key": "ed25519:AagvVWD54VidDYQwFZ1hdzBAKaxy9gEMhssDqptP9Dmr",
+    "agent_allowance": "8000000000000000000000",
+    "daily_cap": "50000000000000000000000",
+    "max_price": "10000000000000000000000",
+    "day_length_sec": 86400
+   },
+   "label": "deploy + init spend-cap contract on wallet",
+   "hash": "C84RQzFKZTFtNVuLKs71yhGzTJ6mJ72Xa1WaKLMXQCQE",
+   "link": "https://testnet.nearblocks.io/txns/C84RQzFKZTFtNVuLKs71yhGzTJ6mJ72Xa1WaKLMXQCQE",
+   "ok": true,
+   "reason": null,
+   "events": [
+    {
+     "executor": "agent.qsc-mvz6dr8l7057.testnet",
+     "standard": "quotum-spendcap",
+     "version": "1.0.0",
+     "event": "init",
+     "data": [
+      {
+       "owner_id": "qsc-mvz6dr8l7057.testnet",
+       "provider_id": "infer.qsc-mvz6dr8l7057.testnet",
+       "agent_key": "ed25519:AagvVWD54VidDYQwFZ1hdzBAKaxy9gEMhssDqptP9Dmr",
+       "agent_allowance": "8000000000000000000000",
+       "daily_cap": "50000000000000000000000",
+       "max_price": "10000000000000000000000",
+       "day_length_sec": 86400
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lock_wallet",
+   "at": "2026-11-02T11:28:44.169Z",
+   "label": "lock wallet (delete its full-access key)",
+   "hash": "hoZnnwteEwJKWejQr19FxsZN18YGKaiTctCvDwzaYWR",
+   "link": "https://testnet.nearblocks.io/txns/hoZnnwteEwJKWejQr19FxsZN18YGKaiTctCvDwzaYWR",
+   "ok": true,
+   "reason": null,
+   "events": []
+  },
+  {
+   "name": "wallet_keys",
+   "at": "2026-11-02T11:28:45.913Z",
+   "keys": [
+    {
+     "access_key": {
+      "nonce": 275892385000000,
+      "permission": {
+       "FunctionCall": {
+        "allowance": "8000000000000000000000",
+        "method_names": [
+         "pay"
+        ],
+        "receiver_id": "agent.qsc-mvz6dr8l7057.testnet"
+       }
+      }
+     },
+     "public_key": "ed25519:AagvVWD54VidDYQwFZ1hdzBAKaxy9gEMhssDqptP9Dmr"
+    }
+   ]
+  },
+  {
+   "name": "status_day0_start",
+   "at": "2026-11-02T11:28:46.248Z",
+   "status": {
+    "owner_id": "qsc-mvz6dr8l7057.testnet",
+    "provider_id": "infer.qsc-mvz6dr8l7057.testnet",
+    "agent_key": "ed25519:AagvVWD54VidDYQwFZ1hdzBAKaxy9gEMhssDqptP9Dmr",
+    "agent_allowance": "8000000000000000000000",
+    "daily_cap": "50000000000000000000000",
+    "max_price": "10000000000000000000000",
+    "day_length_sec": 86400,
+    "day": 0,
+    "day_started_ns": 1793618917745953300,
+    "spent_today": "0",
+    "remaining_today": "50000000000000000000000",
+    "requests_today": 0,
+    "total_paid": "0",
+    "now_ns": 1793618923771836200,
+    "bell_open_to_anyone": false,
+    "agent_key_active": true
+   }
+  },
+  {
+   "name": "agent_allowance_start",
+   "at": "2026-11-02T11:28:46.729Z",
+   "allowance": "8000000000000000000000"
+  },
+  {
+   "name": "day0_loop",
+   "at": "2026-11-02T11:29:14.668Z",
+   "requests": [
+    {
+     "requestId": "d0-r1-mvz6ed8p",
+     "price": "10000000000000000000000",
+     "pay": {
+      "label": "pay d0-r1-mvz6ed8p",
+      "kind": "ok",
+      "hash": "9nwCUrzRuss68dZcKKqA6GAJNYj8AQLKQteziHJc1Zrf",
+      "link": "https://testnet.nearblocks.io/txns/9nwCUrzRuss68dZcKKqA6GAJNYj8AQLKQteziHJc1Zrf",
+      "reason": null,
+      "events": [
+       {
+        "executor": "agent.qsc-mvz6dr8l7057.testnet",
+        "standard": "quotum-spendcap",
+        "version": "1.0.0",
+        "event": "paid",
+        "data": [
+         {
+          "request_id": "d0-r1-mvz6ed8p",
+          "amount": "10000000000000000000000",
+          "provider_id": "infer.qsc-mvz6dr8l7057.testnet",
+          "day": 0,
+          "spent_today": "10000000000000000000000",
+          "daily_cap": "50000000000000000000000",
+          "requests_today": 1
+         }
+        ]
+       }
+      ],
+      "gas_burnt": "2483220211349",
+      "tokens_burnt": "226003764884900000000",
+      "allowance_before": "8000000000000000000000",
+      "allowance_after": "7773996235115100000000",
+      "at": "2026-11-02T11:28:51.407Z"
+     },
+     "served": {
+      "status": 200,
+      "body": {
+       "request_id": "d0-r1-mvz6ed8p",
+       "model": "mock-llm-0",
+       "completion": "mock answer #1 to: what is an access key",
+       "paid_tx": "9nwCUrzRuss68dZcKKqA6GAJNYj8AQLKQteziHJc1Zrf"
+      }
+     }
+    },
+    {
+     "requestId": "d0-r2-mvz6eh4b",
+     "price": "10000000000000000000000",
+     "pay": {
+      "label": "pay d0-r2-mvz6eh4b",
+      "kind": "ok",
+      "hash": "3a4czPo9y9oZXY7d76mr9z376TQK62HNhujWR8cwS3N7",
+      "link": "https://testnet.nearblocks.io/txns/3a4czPo9y9oZXY7d76mr9z376TQK62HNhujWR8cwS3N7",
+      "reason": null,
+      "events": [
+       {
+        "executor": "agent.qsc-mvz6dr8l7057.testnet",
+        "standard": "quotum-spendcap",
+        "version": "1.0.0",
+        "event": "paid",
+        "data": [
+         {
+          "request_id": "d0-r2-mvz6eh4b",
+          "amount": "10000000000000000000000",
+          "provider_id": "infer.qsc-mvz6dr8l7057.testnet",
+          "day": 0,
+          "spent_today": "20000000000000000000000",
+          "daily_cap": "50000000000000000000000",
+          "requests_today": 2
+         }
+        ]
+       }
+      ],
+      "gas_burnt": "2483220211349",
+      "tokens_burnt": "226003764884900000000",
+      "allowance_before": "7773996235115100000000",
+      "allowance_after": "7547992470230200000000",
+      "at": "2026-11-02T11:28:56.067Z"
+     },
+     "served": {
+      "status": 200,
+      "body": {
+       "request_id": "d0-r2-mvz6eh4b",
+       "model": "mock-llm-0",
+       "completion": "mock answer #2 to: explain allowance",
+       "paid_tx": "3a4czPo9y9oZXY7d76mr9z376TQK62HNhujWR8cwS3N7"
+      }
+     }
+    },
+    {
+     "requestId": "d0-r3-mvz6ekq5",
+     "price": "10000000000000000000000",
+     "pay": {
+      "label": "pay d0-r3-mvz6ekq5",
+      "kind": "ok",
+      "hash": "CHvzrenk8rGdddw5MvR6mBqc2kwcqdb7zyWboFwMdMeV",
+      "link": "https://testnet.nearblocks.io/txns/CHvzrenk8rGdddw5MvR6mBqc2kwcqdb7zyWboFwMdMeV",
+      "reason": null,
+      "events": [
+       {
+        "executor": "agent.qsc-mvz6dr8l7057.testnet",
+        "standard": "quotum-spendcap",
+        "version": "1.0.0",
+        "event": "paid",
+        "data": [
+         {
+          "request_id": "d0-r3-mvz6ekq5",
+          "amount": "10000000000000000000000",
+          "provider_id": "infer.qsc-mvz6dr8l7057.testnet",
+          "day": 0,
+          "spent_today": "30000000000000000000000",
+          "daily_cap": "50000000000000000000000",
+          "requests_today": 3
+         }
+        ]
+       }
+      ],
+      "gas_burnt": "2483220211349",
+      "tokens_burnt": "226003764884900000000",
+      "allowance_before": "7547992470230200000000",
+      "allowance_after": "7321988705345300000000",
+      "at": "2026-11-02T11:29:00.528Z"
+     },
+     "served": {
+      "status": 200,
+      "body": {
+       "request_id": "d0-r3-mvz6ekq5",
+       "model": "mock-llm-0",
+       "completion": "mock answer #3 to: draft a haiku",
+       "paid_tx": "CHvzrenk8rGdddw5MvR6mBqc2kwcqdb7zyWboFwMdMeV"
+      }
+     }
+    },
+    {
+     "requestId": "d0-r4-mvz6eo3a",
+     "price": "10000000000000000000000",
+     "pay": {
+      "label": "pay d0-r4-mvz6eo3a",
+      "kind": "ok",
+      "hash": "uLhFVhQXsdyKf7jrcRQePssdvRGY4bN89NtXVPAWHFw",
+      "link": "https://testnet.nearblocks.io/txns/uLhFVhQXsdyKf7jrcRQePssdvRGY4bN89NtXVPAWHFw",
+      "reason": null,
+      "events": [
+       {
+        "executor": "agent.qsc-mvz6dr8l7057.testnet",
+        "standard": "quotum-spendcap",
+        "version": "1.0.0",
+        "event": "paid",
+        "data": [
+         {
+          "request_id": "d0-r4-mvz6eo3a",
+          "amount": "10000000000000000000000",
+          "provider_id": "infer.qsc-mvz6dr8l7057.testnet",
+          "day": 0,
+          "spent_today": "40000000000000000000000",
+          "daily_cap": "50000000000000000000000",
+          "requests_today": 4
+         }
+        ]
+       }
+      ],
+      "gas_burnt": "2483220211349",
+      "tokens_burnt": "226003764884900000000",
+      "allowance_before": "7321988705345300000000",
+      "allowance_after": "7095984940460400000000",
+      "at": "2026-11-02T11:29:05.460Z"
+     },
+     "served": {
+      "status": 200,
+      "body": {
+       "request_id": "d0-r4-mvz6eo3a",
+       "model": "mock-llm-0",
+       "completion": "mock answer #4 to: translate 'cap'",
+       "paid_tx": "uLhFVhQXsdyKf7jrcRQePssdvRGY4bN89NtXVPAWHFw"
+      }
+     }
+    },
+    {
+     "requestId": "d0-r5-mvz6ervx",
+     "price": "10000000000000000000000",
+     "pay": {
+      "label": "pay d0-r5-mvz6ervx",
+      "kind": "ok",
+      "hash": "6AskhWtU6iGqu8cfXfLQvRNWDVbaZpr3kiTPXGVcMBET",
+      "link": "https://testnet.nearblocks.io/txns/6AskhWtU6iGqu8cfXfLQvRNWDVbaZpr3kiTPXGVcMBET",
+      "reason": null,
+      "events": [
+       {
+        "executor": "agent.qsc-mvz6dr8l7057.testnet",
+        "standard": "quotum-spendcap",
+        "version": "1.0.0",
+        "event": "paid",
+        "data": [
+         {
+          "request_id": "d0-r5-mvz6ervx",
+          "amount": "10000000000000000000000",
+          "provider_id": "infer.qsc-mvz6dr8l7057.testnet",
+          "day": 0,
+          "spent_today": "50000000000000000000000",
+          "daily_cap": "50000000000000000000000",
+          "requests_today": 5
+         }
+        ]
+       }
+      ],
+      "gas_burnt": "2483220211349",
+      "tokens_burnt": "226003764884900000000",
+      "allowance_before": "7095984940460400000000",
+      "allowance_after": "6869981175575500000000",
+      "at": "2026-11-02T11:29:10.439Z"
+     },
+     "served": {
+      "status": 200,
+      "body": {
+       "request_id": "d0-r5-mvz6ervx",
+       "model": "mock-llm-0",
+       "completion": "mock answer #5 to: summarise NEP-141",
+       "paid_tx": "6AskhWtU6iGqu8cfXfLQvRNWDVbaZpr3kiTPXGVcMBET"
+      }
+     }
+    },
+    {
+     "requestId": "d0-r6-mvz6evqc",
+     "price": "10000000000000000000000",
+     "pay": {
+      "label": "pay d0-r6-mvz6evqc",
+      "kind": "denied",
+      "hash": "57cpVbNoUWBBxNkZMzksncWGyqRYir6w4kiqt1B7qy1L",
+      "link": "https://testnet.nearblocks.io/txns/57cpVbNoUWBBxNkZMzksncWGyqRYir6w4kiqt1B7qy1L",
+      "reason": "SPENDCAP_DENIED: over daily cap: spent 50000000000000000000000 + 10000000000000000000000 > cap 50000000000000000000000 (day 0, request d0-r6-mvz6evqc)",
+      "events": [],
+      "gas_burnt": "1586311264535",
+      "tokens_burnt": "158631126453500000000",
+      "allowance_before": "6869981175575500000000",
+      "allowance_after": "6711350049122000000000",
+      "at": "2026-11-02T11:29:14.668Z"
+     }
+    }
+   ]
+  },
+  {
+   "name": "forbidden_probes",
+   "at": "2026-11-02T11:29:18.223Z",
+   "results": [
+    {
+     "label": "call set_policy (owner method)",
+     "kind": "rejected",
+     "hash": null,
+     "reason": "AccessKeyMethodNameMismatchActionError: Access key does not allow method set_policy",
+     "allowance_before": "6711350049122000000000",
+     "at": "2026-11-02T11:29:15.494Z"
+    },
+    {
+     "label": "pay with 1 yocto attached deposit",
+     "kind": "rejected",
+     "hash": null,
+     "reason": "Deposit: Deposit is not allowed with function call",
+     "allowance_before": "6711350049122000000000",
+     "at": "2026-11-02T11:29:16.402Z"
+    },
+    {
+     "label": "plain transfer (1 yocto)",
+     "kind": "rejected",
+     "hash": null,
+     "reason": "full access: Access key requires full access",
+     "allowance_before": "6711350049122000000000",
+     "at": "2026-11-02T11:29:17.370Z"
+    },
+    {
+     "label": "call pay on another receiver (qsc-mvz6dr8l7057.testnet)",
+     "kind": "rejected",
+     "hash": null,
+     "reason": "AccessKeyReceiverMismatchActionError: Access key receiver agent.qsc-mvz6dr8l7057.testnet does not match transaction receiver qsc-mvz6dr8l7057.testnet",
+     "allowance_before": "6711350049122000000000",
+     "at": "2026-11-02T11:29:18.223Z"
+    }
+   ]
+  },
+  {
+   "name": "stranger_bell_early",
+   "at": "2026-11-02T11:29:23.340Z",
+   "label": "stranger stranger.qsc-mvz6dr8l7057.testnet rings bell early",
+   "hash": "7Yy7mBDQaa8E4MKnTDSP5ByHJgs7q5j5iXenRX8CPE5E",
+   "link": "https://testnet.nearblocks.io/txns/7Yy7mBDQaa8E4MKnTDSP5ByHJgs7q5j5iXenRX8CPE5E",
+   "ok": false,
+   "reason": "bell: only the owner may ring before the day has elapsed",
+   "events": []
+  },
+  {
+   "name": "retry_storm",
+   "at": "2026-11-02T11:29:48.217Z",
+   "attempts": [
+    {
+     "label": "storm 1",
+     "kind": "denied",
+     "hash": "Acbnznq1ueAwgC8LGsaR6k1ZMJbr7f99YkkXvjiXnGi6",
+     "link": "https://testnet.nearblocks.io/txns/Acbnznq1ueAwgC8LGsaR6k1ZMJbr7f99YkkXvjiXnGi6",
+     "reason": "SPENDCAP_DENIED: over daily cap: spent 50000000000000000000000 + 10000000000000000000000 > cap 50000000000000000000000 (day 0, request d0-storm-1)",
+     "events": [],
+     "gas_burnt": "1585041322047",
+     "tokens_burnt": "158504132204700000000",
+     "allowance_before": "6711350049122000000000",
+     "allowance_after": "6552845916917300000000",
+     "at": "2026-11-02T11:29:26.805Z"
+    },
+    {
+     "label": "storm 2",
+     "kind": "denied",
+     "hash": "Cse2D7gLih768TCohc3udb7vgPs3XybRALczWPQAPxNJ",
+     "link": "https://testnet.nearblocks.io/txns/Cse2D7gLih768TCohc3udb7vgPs3XybRALczWPQAPxNJ",
+     "reason": "SPENDCAP_DENIED: over daily cap: spent 50000000000000000000000 + 10000000000000000000000 > cap 50000000000000000000000 (day 0, request d0-storm-2)",
+     "events": [],
+     "gas_burnt": "1585041322047",
+     "tokens_burnt": "158504132204700000000",
+     "allowance_before": "6552845916917300000000",
+     "allowance_after": "6394341784712600000000",
+     "at": "2026-11-02T11:29:30.276Z"
+    },
+    {
+     "label": "storm 3",
+     "kind": "denied",
+     "hash": "2mgmWzRKqBKmJWWMhuc2W9CnSgCjnjCRZ2g3MZTTPgdL",
+     "link": "https://testnet.nearblocks.io/txns/2mgmWzRKqBKmJWWMhuc2W9CnSgCjnjCRZ2g3MZTTPgdL",
+     "reason": "SPENDCAP_DENIED: over daily cap: spent 50000000000000000000000 + 10000000000000000000000 > cap 50000000000000000000000 (day 0, request d0-storm-3)",
+     "events": [],
+     "gas_burnt": "1585041322047",
+     "tokens_burnt": "158504132204700000000",
+     "allowance_before": "6394341784712600000000",
+     "allowance_after": "6235837652507900000000",
+     "at": "2026-11-02T11:29:34.092Z"
+    },
+    {
+     "label": "storm 4",
+     "kind": "denied",
+     "hash": "3PhzsMrsAy6xS38NL48y4wdDpbV5rGL2cJ2JqM5iFo8X",
+     "link": "https://testnet.nearblocks.io/txns/3PhzsMrsAy6xS38NL48y4wdDpbV5rGL2cJ2JqM5iFo8X",
+     "reason": "SPENDCAP_DENIED: over daily cap: spent 50000000000000000000000 + 10000000000000000000000 > cap 50000000000000000000000 (day 0, request d0-storm-4)",
+     "events": [],
+     "gas_burnt": "1585041322047",
+     "tokens_burnt": "158504132204700000000",
+     "allowance_before": "6235837652507900000000",
+     "allowance_after": "6077333520303200000000",
+     "at": "2026-11-02T11:29:37.730Z"
+    },
+    {
+     "label": "storm 5",
+     "kind": "denied",
+     "hash": "61Hgr6MxDBezGSXGu2iXwCbui2Cgczvg83GDWNFVAtQt",
+     "link": "https://testnet.nearblocks.io/txns/61Hgr6MxDBezGSXGu2iXwCbui2Cgczvg83GDWNFVAtQt",
+     "reason": "SPENDCAP_DENIED: over daily cap: spent 50000000000000000000000 + 10000000000000000000000 > cap 50000000000000000000000 (day 0, request d0-storm-5)",
+     "events": [],
+     "gas_burnt": "1585041322047",
+     "tokens_burnt": "158504132204700000000",
+     "allowance_before": "6077333520303200000000",
+     "allowance_after": "5918829388098500000000",
+     "at": "2026-11-02T11:29:41.433Z"
+    },
+    {
+     "label": "storm 6",
+     "kind": "rejected",
+     "hash": null,
+     "reason": "Not enough allowance: Not enough allowance for access key ed25519:AagvVWD54VidDYQwFZ1hdzBAKaxy9gEMhssDqptP9Dmr on account agent.qsc-mvz6dr8l7057.testnet (allowance: 5918829388098500000000, cost: 5919025319281000000000)",
+     "allowance_before": "5918829388098500000000",
+     "allowance_at_check": "5918829388098500000000",
+     "tx_cost_required": "5919025319281000000000",
+     "at": "2026-11-02T11:29:42.276Z"
+    },
+    {
+     "label": "storm 7",
+     "kind": "rejected",
+     "hash": null,
+     "reason": "Not enough allowance: Not enough allowance for access key ed25519:AagvVWD54VidDYQwFZ1hdzBAKaxy9gEMhssDqptP9Dmr on account agent.qsc-mvz6dr8l7057.testnet (allowance: 5918829388098500000000, cost: 5919025319281000000000)",
+     "allowance_before": "5918829388098500000000",
+     "allowance_at_check": "5918829388098500000000",
+     "tx_cost_required": "5919025319281000000000",
+     "at": "2026-11-02T11:29:48.217Z"
+    }
+   ]
+  },
+  {
+   "name": "request_after_hardcap",
+   "at": "2026-11-02T11:29:49.023Z",
+   "requestId": "d0-after-hardcap-mvz6foop",
+   "price": "10000000000000000000000",
+   "pay": {
+    "label": "pay d0-after-hardcap-mvz6foop",
+    "kind": "rejected",
+    "hash": null,
+    "reason": "Not enough allowance: Not enough allowance for access key ed25519:AagvVWD54VidDYQwFZ1hdzBAKaxy9gEMhssDqptP9Dmr on account agent.qsc-mvz6dr8l7057.testnet (allowance: 5918829388098500000000, cost: 5919062212192000000000)",
+    "allowance_before": "5918829388098500000000",
+    "allowance_at_check": "5918829388098500000000",
+    "tx_cost_required": "5919062212192000000000",
+    "at": "2026-11-02T11:29:49.023Z"
+   }
+  },
+  {
+   "name": "owner_bell",
+   "at": "2026-11-02T11:29:52.856Z",
+   "status_before": {
+    "owner_id": "qsc-mvz6dr8l7057.testnet",
+    "provider_id": "infer.qsc-mvz6dr8l7057.testnet",
+    "agent_key": "ed25519:AagvVWD54VidDYQwFZ1hdzBAKaxy9gEMhssDqptP9Dmr",
+    "agent_allowance": "8000000000000000000000",
+    "daily_cap": "50000000000000000000000",
+    "max_price": "10000000000000000000000",
+    "day_length_sec": 86400,
+    "day": 0,
+    "day_started_ns": 1793618917745953300,
+    "spent_today": "50000000000000000000000",
+    "remaining_today": "0",
+    "requests_today": 5,
+    "total_paid": "50000000000000000000000",
+    "now_ns": 1793618987521770000,
+    "bell_open_to_anyone": false,
+    "agent_key_active": true
+   },
+   "label": "owner rings bell",
+   "hash": "2eHm9KeuyjZ9Yvs3iE2SH76YeKdzBxwJfYGP2N9uo5Ba",
+   "link": "https://testnet.nearblocks.io/txns/2eHm9KeuyjZ9Yvs3iE2SH76YeKdzBxwJfYGP2N9uo5Ba",
+   "ok": true,
+   "reason": null,
+   "events": [
+    {
+     "executor": "agent.qsc-mvz6dr8l7057.testnet",
+     "standard": "quotum-spendcap",
+     "version": "1.0.0",
+     "event": "bell",
+     "data": [
+      {
+       "day": 0,
+       "rung_by": "qsc-mvz6dr8l7057.testnet",
+       "early": true,
+       "daily_cap": "50000000000000000000000",
+       "spent": "50000000000000000000000",
+       "unspent": "0",
+       "requests": 5,
+       "next_day": 1,
+       "agent_allowance": "8000000000000000000000"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "status_day1_start",
+   "at": "2026-11-02T11:29:55.149Z",
+   "status": {
+    "owner_id": "qsc-mvz6dr8l7057.testnet",
+    "provider_id": "infer.qsc-mvz6dr8l7057.testnet",
+    "agent_key": "ed25519:AagvVWD54VidDYQwFZ1hdzBAKaxy9gEMhssDqptP9Dmr",
+    "agent_allowance": "8000000000000000000000",
+    "daily_cap": "50000000000000000000000",
+    "max_price": "10000000000000000000000",
+    "day_length_sec": 86400,
+    "day": 1,
+    "day_started_ns": 1793618990440433200,
+    "spent_today": "0",
+    "remaining_today": "50000000000000000000000",
+    "requests_today": 0,
+    "total_paid": "50000000000000000000000",
+    "now_ns": 1793618992644300800,
+    "bell_open_to_anyone": false,
+    "agent_key_active": true
+   },
+   "agent_key_allowance": "8000000000000000000000",
+   "day0_record": {
+    "day": 0,
+    "started_ns": 1793618917745953300,
+    "closed_ns": 1793618990440433200,
+    "daily_cap": "50000000000000000000000",
+    "spent": "50000000000000000000000",
+    "unspent": "0",
+    "requests": 5
+   }
+  },
+  {
+   "name": "day1_loop",
+   "at": "2026-11-02T11:30:00.048Z",
+   "requests": [
+    {
+     "requestId": "d1-r1-mvz6fu19",
+     "price": "10000000000000000000000",
+     "pay": {
+      "label": "pay d1-r1-mvz6fu19",
+      "kind": "ok",
+      "hash": "CPFLA2y9oJFJHBbhk7cesebMaGENH3Gkqb7eg9nR7PN1",
+      "link": "https://testnet.nearblocks.io/txns/CPFLA2y9oJFJHBbhk7cesebMaGENH3Gkqb7eg9nR7PN1",
+      "reason": null,
+      "events": [
+       {
+        "executor": "agent.qsc-mvz6dr8l7057.testnet",
+        "standard": "quotum-spendcap",
+        "version": "1.0.0",
+        "event": "paid",
+        "data": [
+         {
+          "request_id": "d1-r1-mvz6fu19",
+          "amount": "10000000000000000000000",
+          "provider_id": "infer.qsc-mvz6dr8l7057.testnet",
+          "day": 1,
+          "spent_today": "10000000000000000000000",
+          "daily_cap": "50000000000000000000000",
+          "requests_today": 1
+         }
+        ]
+       }
+      ],
+      "gas_burnt": "2487782679617",
+      "tokens_burnt": "226460011711700000000",
+      "allowance_before": "8000000000000000000000",
+      "allowance_after": "7773539988288300000000",
+      "at": "2026-11-02T11:29:59.792Z"
+     },
+     "served": {
+      "status": 200,
+      "body": {
+       "request_id": "d1-r1-mvz6fu19",
+       "model": "mock-llm-0",
+       "completion": "mock answer #6 to: good morning, new day",
+       "paid_tx": "CPFLA2y9oJFJHBbhk7cesebMaGENH3Gkqb7eg9nR7PN1"
+      }
+     }
+    }
+   ]
+  }
+ ],
+ "config": {
+  "wasm": "contract/target/wasm32-unknown-unknown/release/quotum_spendcap.wasm",
+  "price": "10000000000000000000000",
+  "dailyCap": "50000000000000000000000",
+  "allowance": "8000000000000000000000",
+  "payGasTgas": 5,
+  "walletFund": "2300000000000000000000000",
+  "providerFund": "50000000000000000000000",
+  "lock": true,
+  "stormMax": 40,
+  "dayLengthSec": 86400,
+  "wasm_sha256": "0e8605b2f01e395b95702fba34f1709851b6729afff158f864a05ad2b232295d",
+  "wasm_bytes": 178181,
+  "node": "v22.22.3",
+  "near_api_js": "7.4.0"
+ },
+ "chain": {
+  "chain_id": "testnet",
+  "protocol_version": 88,
+  "node_version": {
+   "build": "2.14.0-rc.5",
+   "commit": "b7b4737cab46f17a6daa2ed694d7aebbd204363a",
+   "rustc_version": "1.95.0",
+   "version": "2.14.0-rc.5"
+  }
+ },
+ "accounts": {
+  "owner": "qsc-mvz6dr8l7057.testnet",
+  "wallet": "agent.qsc-mvz6dr8l7057.testnet",
+  "provider": "infer.qsc-mvz6dr8l7057.testnet",
+  "stranger": "stranger.qsc-mvz6dr8l7057.testnet",
+  "agent_public_key": "ed25519:AagvVWD54VidDYQwFZ1hdzBAKaxy9gEMhssDqptP9Dmr"
+ },
+ "result": {
+  "provider_received": "60000000000000000000000",
+  "endpoint_stats": {
+   "served": 6,
+   "quoted": 8,
+   "rejected": 0
+  },
+  "final_status": {
+   "owner_id": "qsc-mvz6dr8l7057.testnet",
+   "provider_id": "infer.qsc-mvz6dr8l7057.testnet",
+   "agent_key": "ed25519:AagvVWD54VidDYQwFZ1hdzBAKaxy9gEMhssDqptP9Dmr",
+   "agent_allowance": "8000000000000000000000",
+   "daily_cap": "50000000000000000000000",
+   "max_price": "10000000000000000000000",
+   "day_length_sec": 86400,
+   "day": 1,
+   "day_started_ns": 1793618990440433200,
+   "spent_today": "10000000000000000000000",
+   "remaining_today": "40000000000000000000000",
+   "requests_today": 1,
+   "total_paid": "60000000000000000000000",
+   "now_ns": 1793618998388276700,
+   "bell_open_to_anyone": false,
+   "agent_key_active": true
+  }
+ },
+ "finished": "2026-11-02T11:30:00.595Z"
+}
