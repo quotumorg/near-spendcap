@@ -13,7 +13,7 @@ These are the demo defaults. The locked wallet has no full-access key. The owner
 
 ## quickstart
 
-Requires Rust 1.95 or newer, Node 22 or newer with npm, Python 3, and network access for dependencies, the faucet, and NEAR testnet RPC. The script installs the Wasm target if needed. Optional builder: `cargo install cargo-near --version 0.22.0 --locked --no-default-features`.
+Requires Rust 1.95 or newer, Node 22 or newer with npm, Python 3, and network access for dependencies, the faucet, and NEAR testnet RPC. Rust must be installed through rustup; the script uses it to install the Wasm target if needed. Native contract tests also need a working C/C++ build toolchain. Optional builder: `cargo install cargo-near --version 0.22.0 --locked --no-default-features`.
 
 ```bash
 ./reproduce.sh
@@ -21,7 +21,7 @@ Requires Rust 1.95 or newer, Node 22 or newer with npm, Python 3, and network ac
 
 This builds and tests the contract, installs locked JavaScript dependencies, creates faucet accounts, deploys and locks a testnet wallet, and runs the scenario. Five payments succeed, the sixth exceeds the soft cap, forbidden actions are refused, retries reach the allowance limit, and a bell enables the next day's payment. Each run writes a JSON record and a Markdown transaction table under `runs/`.
 
-Throwaway credentials stay outside the repository in a hidden testnet credentials directory under the home directory. `SPENDCAP_CREDS_DIR` overrides the directory. `NEAR_RPC_URL` overrides the testnet RPC; the script checks `chain_id` before signing. Demo settings: `PRICE_NEAR`, `DAILY_CAP_NEAR`, `ALLOWANCE_NEAR`, `PAY_GAS_TGAS`, and `DAY_LENGTH_SEC`.
+By default, throwaway credentials are stored outside the repository in a hidden testnet credentials directory under the home directory. If you set `SPENDCAP_CREDS_DIR`, choose a directory outside the repository. `NEAR_RPC_URL` overrides the testnet RPC; the script checks `chain_id` before signing. Demo settings: `PRICE_NEAR`, `DAILY_CAP_NEAR`, `ALLOWANCE_NEAR`, `PAY_GAS_TGAS`, and `DAY_LENGTH_SEC`.
 
 ## verify
 
@@ -70,7 +70,7 @@ Full records: [run](runs/run-2026-11-02T11-28-17-721Z.md) and [JSON](runs/run-20
 
 ## honest limits
 
-- The allowance bounds fees and transaction count, not value; value is bounded by the contract. Recommended: the owner funds the wallet with about one day's cap at a time, so the worst case for a contract bug is one day of budget.
+- The allowance bounds fees and transaction count, not value; value is bounded by the contract. Recommended: keep the wallet's spendable balance to about one day's budget plus required storage and reserve. The demo funds 2.3 NEAR; its 0.05 NEAR daily cap does not bound losses from an arbitrary contract bug.
 - The soft cap is whatever the owner sets. quotum's holder vote is not on NEAR yet: `set_policy` is owner-only, and the owner can also ring the bell early.
 - Days end at the bell, not in a rolling 24-hour window. Time alone does not reset spend. A payment just before the bell and another just after it count toward different days.
 - Spend is charged when a transfer is scheduled. Failed transfers do not restore the cap. `spent_today` and `total_paid` count scheduled amounts, not confirmed provider receipts.
@@ -93,7 +93,7 @@ quotum existed before this hackathon. The existing service enforced inference ca
 - Reproduction script, agent probes, a recorded testnet run, and independent Python verifier.
 
 [Compare the NEAR integration](https://github.com/quotumorg/near-spendcap/compare/pre-hackathon...hackathon-submission).
-The `pre-hackathon` tag contains only a README stub and MIT license. It is a locally prepared comparison anchor, not a historical snapshot of the existing quotum service; the baseline service code is not included. Both tags were prepared locally on 2026-11-02 without backdating.
+The `pre-hackathon` tag contains only a README stub and MIT license. It is a locally prepared comparison anchor, not a historical snapshot of the existing quotum service; the baseline service code is not included. Both tags were prepared locally on 2026-11-02 without backdating. Git history also contains earlier pre-fix testnet runs; only `run-2026-11-02T11-28-17-721Z` is current evidence.
 
 ## license
 
