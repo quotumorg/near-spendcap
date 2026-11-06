@@ -85,6 +85,8 @@ The mock's replay guard is in memory and resets on restart. It trusts one RPC, d
 
 ## what was built in the hackathon window
 
+Baseline disclosure: quotum runs an x402 facilitator with per-seat daily inference caps and a daily buyback/burn bell on Robinhood Chain. Only the NEAR integration is presented for judging; the baseline service code is not included.
+
 quotum existed before this hackathon. The existing service enforced inference caps off-chain; this repository contains the NEAR integration built for the 2026-11-01 to 2026-11-14 window:
 
 - Rust policy wallet using near-sdk 5.30.0: daily ledger, cap, max price, fixed provider, bell, kill switch, and 21 unit tests.
